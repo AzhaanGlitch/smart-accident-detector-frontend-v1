@@ -84,6 +84,73 @@ body {
     min-height: 100vh;
 }
 
+/* Mobile Menu Overlay */
+.mobile-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    display: none;
+}
+
+.mobile-overlay.active {
+    display: block;
+}
+
+/* Mobile Header with Hamburger */
+.mobile-header {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background-color: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
+    z-index: 1001;
+    padding: 0 1rem;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.hamburger-menu {
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: var(--transition);
+}
+
+.hamburger-menu:hover {
+    background-color: var(--hover-bg);
+}
+
+.mobile-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.mobile-logo img {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+}
+
+.mobile-logo h6 {
+    color: var(--text-primary);
+    font-weight: 700;
+    font-size: 0.875rem;
+    line-height: 1.2;
+    margin: 0;
+}
+
 /* Sidebar Styles */
 .sidebar {
     width: var(--sidebar-width);
@@ -435,6 +502,121 @@ body {
 
 .btn-primary:hover::before { left: 100%; }
 
+/* Team Card Hover Fix - Preserve images */
+.team-card {
+    transition: all 0.3s ease;
+    height: 320px !important;
+    overflow: hidden;
+    position: relative;
+}
+
+.team-card:hover {
+    transform: translateY(-10px);
+    height: 400px !important;
+}
+
+.team-avatar {
+    width: 100px !important;
+    height: 100px !important;
+    border-radius: 50%;
+    margin: 0 auto;
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    border: 3px solid #007bff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #007bff;
+    font-size: 2rem;
+    position: relative;
+}
+
+/* Team Member Background Images - FIXED */
+.team-avatar.avatar-azhaan {
+    background: url('assets/azhaan.jpg') center/cover no-repeat !important;
+}
+.team-avatar.avatar-anshuman {
+    background: url('assets/anshuman.jpg') center/cover no-repeat !important;
+}
+.team-avatar.avatar-shresth {
+    background: url('assets/shresth.jpg') center/cover no-repeat !important;
+}
+.team-avatar.avatar-adhya {
+    background: url('assets/adhya.jpg') center/cover no-repeat !important;
+}
+.team-avatar.avatar-arpita {
+    background: url('assets/arpita.png') center/cover no-repeat !important;
+}
+
+/* CRITICAL FIX: Override any hover effects that might change the background */
+.team-avatar.avatar-azhaan:hover,
+.team-avatar.avatar-anshuman:hover,
+.team-avatar.avatar-shresth:hover,
+.team-avatar.avatar-adhya:hover,
+.team-avatar.avatar-arpita:hover {
+    background: inherit !important;
+}
+
+/* Hide icons when background image is present */
+.team-avatar.avatar-azhaan i,
+.team-avatar.avatar-anshuman i,
+.team-avatar.avatar-shresth i,
+.team-avatar.avatar-adhya i,
+.team-avatar.avatar-arpita i {
+    display: none !important;
+}
+
+/* Social links initially hidden */
+.social-links {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    width: 100%;
+    text-align: center;
+}
+
+.team-card:hover .social-links {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* Card content positioning */
+.team-card .card-body {
+    position: relative;
+    height: 100%;
+    padding-bottom: 80px;
+}
+
+.team-card .card-text {
+    margin-bottom: 20px;
+}
+
+/* Social button styling */
+.social-links .btn {
+    margin: 0 5px;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Fallback for images that fail to load */
+.team-avatar:not([class*="avatar-"]) {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Remove the problematic ::before pseudo element that was creating gradients */
+.team-avatar::before {
+    display: none !important;
+}
+
 /* Animations */
 @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes slideInLeft { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
@@ -446,27 +628,13 @@ body {
 /* Theme Toggle Animation */
 .theme-transition { transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1) !important; }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    .sidebar { transform: translateX(-100%); transition: transform 0.3s ease; }
-    .sidebar.show { transform: translateX(0); }
-    .main-content { margin-left: 0; }
-    .page-header { padding: 1.5rem 1rem; }
-    .page-header .d-flex { flex-direction: column; align-items: flex-start !important; gap: 1rem; }
-    .page-title { font-size: 1.875rem; }
-    body { --sidebar-width: 0px; }
-}
-
-/* Selection Styles */
-::selection { background-color: var(--primary-color); color: white; }
-
 /* MODIFIED & ADDED STYLES FOR RESULTS */
 .results-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr); /* Creates a 2-column grid */
-    gap: 1.5rem; /* A bit more space */
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
     margin-top: 1.5rem;
-    max-width: 600px; /* Prevents boxes from being too wide */
+    max-width: 600px;
     margin-left: auto;
     margin-right: auto;
 }
@@ -502,3 +670,113 @@ body {
     font-size: 1.1rem;
     grid-column: 1 / -1;
 }
+
+/* MOBILE RESPONSIVE DESIGN */
+@media (max-width: 768px) {
+    /* Show mobile header */
+    .mobile-header {
+        display: flex;
+    }
+    
+    /* Hide desktop sidebar initially */
+    .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        width: 280px;
+        z-index: 1000;
+    }
+    
+    /* Show sidebar when active */
+    .sidebar.mobile-active {
+        transform: translateX(0);
+    }
+    
+    /* Adjust main content */
+    .main-content {
+        margin-left: 0;
+        padding-top: 60px; /* Account for mobile header */
+    }
+    
+    /* Adjust page header */
+    .page-header {
+        padding: 1.5rem 1rem;
+    }
+    
+    .page-header .d-flex {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 1rem;
+    }
+    
+    .page-title {
+        font-size: 1.875rem;
+    }
+    
+    /* Adjust container widths */
+    .container-fluid {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+    
+    /* Fix upload area width */
+    .upload-area {
+        width: 100% !important;
+        margin-left: 0 !important;
+        padding: 2rem 1rem;
+    }
+    
+    /* Adjust results grid for mobile */
+    .results-grid {
+        grid-template-columns: 1fr;
+        max-width: 100%;
+    }
+    
+    /* Team cards responsive */
+    .team-card {
+        height: 280px !important;
+    }
+    
+    .team-card:hover {
+        height: 360px !important;
+    }
+    
+    /* Form adjustments */
+    .card-body {
+        padding: 1.5rem;
+    }
+    
+    /* Button adjustments */
+    .btn-primary {
+        padding: 0.875rem 1.5rem;
+    }
+    
+    body {
+        --sidebar-width: 0px;
+    }
+}
+
+/* Smaller mobile screens */
+@media (max-width: 480px) {
+    .page-title {
+        font-size: 1.5rem;
+    }
+    
+    .page-subtitle {
+        font-size: 1rem;
+    }
+    
+    .upload-area {
+        padding: 1.5rem 1rem;
+    }
+    
+    .upload-area h5 {
+        font-size: 1.1rem;
+    }
+    
+    .card-body {
+        padding: 1.25rem;
+    }
+}
+
+/* Selection Styles */
+::selection { background-color: var(--primary-color); color: white; }
