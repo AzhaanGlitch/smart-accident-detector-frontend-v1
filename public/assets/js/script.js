@@ -133,7 +133,7 @@ function handleFiles(files) {
     
     setTimeout(() => {
         // Show success message with animation
-        showNotification(`File uploaded successfully: ${file.name}`, 'success');
+        showNotification(`File ready for testing: ${file.name}`, 'success');
         
         // Update upload area with success state
         updateUploadAreaSuccess(file.name);
@@ -170,8 +170,8 @@ function updateUploadAreaSuccess(fileName) {
     }
 }
 
-// Run Test Function
-function runTest() {
+// Run Test Function --- MODIFIED SECTION
+async function runTest() {
     const fileInput = document.getElementById('fileInput');
     
     if (!fileInput || !fileInput.files.length) {
@@ -179,13 +179,36 @@ function runTest() {
         return;
     }
     
-    // Simulate test running
-    showNotification('Running accident detection test...', 'info');
+    const file = fileInput.files[0];
+    const formData = new FormData();
+    formData.append('file', file); // The backend likely expects the file under the key 'file'
     
-    // Simulate processing time
-    setTimeout(() => {
-        showNotification('Test completed successfully! No accidents detected.', 'success');
-    }, 2000);
+    showNotification('Running accident detection test...', 'info');
+
+    try {
+        // Use fetch to send the file to your backend
+        const response = await fetch('https://azhaanglitch-smart-accident-detector-backend-v2.hf.space/predict', {
+            method: 'POST',
+            body: formData,
+        });
+
+        if (!response.ok) {
+            // Handle server-side errors (e.g., 500 Internal Server Error)
+            throw new Error(`Server responded with status: ${response.status}`);
+        }
+
+        const result = await response.json();
+
+        // Display the prediction from the backend
+        // We assume the backend returns a JSON like { "prediction": "Accident Detected" }
+        const predictionMessage = result.prediction || 'Test completed, but no prediction was returned.';
+        showNotification(predictionMessage, 'success');
+
+    } catch (error) {
+        // Handle network errors or issues with the fetch request
+        console.error('Error during test:', error);
+        showNotification('An error occurred while running the test. Please check the console.', 'error');
+    }
 }
 
 // Contact Form Submission
