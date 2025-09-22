@@ -460,12 +460,15 @@ body {
 /* Selection Styles */
 ::selection { background-color: var(--primary-color); color: white; }
 
-/* ADDED STYLES FOR RESULTS */
+/* MODIFIED & ADDED STYLES FOR RESULTS */
 .results-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(2, 1fr); /* Creates a 2-column grid */
+    gap: 1.5rem; /* A bit more space */
     margin-top: 1.5rem;
+    max-width: 600px; /* Prevents boxes from being too wide */
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .result-card {

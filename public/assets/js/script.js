@@ -72,7 +72,6 @@ function handleFileSelect(e) {
 function handleFiles(files) {
     const file = files[0];
     const fileInput = document.getElementById('fileInput');
-    // Critical fix: Ensure drag-and-dropped files are added to the file input
     if (fileInput) {
         fileInput.files = files; 
     }
@@ -122,7 +121,6 @@ async function runTest() {
     resultVideo.style.display = 'none';
     resultsGrid.innerHTML = '<div class="loading-text">Analyzing media... This may take a moment.</div>';
 
-    // Display the uploaded media preview
     const objectURL = URL.createObjectURL(file);
     if (file.type.startsWith('image')) {
         resultImage.src = objectURL;
@@ -153,15 +151,23 @@ async function runTest() {
             outcomes = { 'Status': 'Error', 'Message': result.error };
         } else {
             const finalModel = result.final_model || {};
-            const bestModel = result.best_model || {};
-            
-            const finalConfidence = (finalModel.confidence ? finalModel.confidence * 100 : 0).toFixed(1);
-            const bestConfidence = (bestModel.confidence ? bestModel.confidence * 100 : 0).toFixed(1);
 
+            // 1. Determine Accident Status based on final_model.prediction
+            let accidentStatus = 'Undetermined';
+            if (finalModel.prediction === 'accident') {
+                accidentStatus = 'Accident Detected';
+            } else if (finalModel.prediction === 'non_accident') {
+                accidentStatus = 'No Accident';
+            }
+
+            // 2. Format confidence score to two decimal places.
+            // This assumes the backend is sending a number that is already a percentage value (e.g., 76.43)
+            const finalConfidence = (finalModel.confidence || 0).toFixed(2);
+
+            // 3. Create the two result boxes
             outcomes = {
-                'Accident Status': result.accident_detected ? 'Accident Detected' : 'No Accident',
-                'Final Model': `${finalModel.prediction || 'N/A'} (${finalConfidence}%)`,
-                'Best Model': `${bestModel.prediction || 'N/A'} (${bestConfidence}%)`,
+                'Accident Status': accidentStatus,
+                'Confidence Score': `${finalConfidence}%`,
             };
         }
 
