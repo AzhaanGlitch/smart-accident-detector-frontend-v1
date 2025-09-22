@@ -63,28 +63,21 @@
                         <h1 class="page-title">Real-time Detection</h1>
                         <p class="page-subtitle">Monitor live camera feeds for instant accident detection.</p>
                     </div>
-                    <div class="d-flex align-items-center">
-                    </div>
                 </div>
             </header>
 
             <div class="container-fluid realtime-container">
                 <div class="row">
                     <div class="col-12">
-                        <div id="camera-feed-area" class="upload-area camera-feed-area">
-                            <div class="text-center">
-                                <i class="fas fa-video fa-3x mb-4"></i>
-                                <h5>Start Camera Detection</h5> 
-                                <p class="mb-4">Click "Start Detection" to begin monitoring the live feed.</p>
-                                <div class="d-flex gap-3 justify-content-center camera-buttons">
-                                    <button class="btn btn-primary px-4" id="detection-btn" onclick="startDetection(event)">
-                                        <i class="fas fa-play"></i> Start Detection
-                                    </button>
-                                    <button class="btn btn-outline-primary px-4" onclick="testCamera()">
-                                        <i class="fas fa-cogs"></i> Test Camera
-                                    </button>
-                                </div>
-                            </div>
+                        <div class="camera-container mb-4">
+                            <video id="videoFeed" playsinline autoplay muted style="width: 100%; height: auto; border-radius: 16px;"></video>
+                            <canvas id="canvas" style="display: none;"></canvas>
+                            <div id="predictionOverlay" class="prediction-overlay"></div>
+                        </div>
+                        <div class="text-center">
+                             <button class="btn btn-primary px-4" id="detection-btn" onclick="toggleDetection(event)">
+                                <i class="fas fa-play"></i> Start Detection
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -93,156 +86,131 @@
     </div>
 
     <style>
-        /* Realtime page specific responsive styles */
-        .realtime-container {
-            padding: 2rem;
+        .camera-container {
+            position: relative;
+            max-width: 900px;
+            margin: auto;
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
         }
-        
-        .camera-feed-area {
-            width: 100%;
-            max-width: 1100px;
-            /* FIX: Changed height to min-height to allow the box to grow */
-            min-height: 320px;
-            margin: 50px auto 0;
-            /* FIX: Added flex properties to perfectly center content vertically */
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .prediction-overlay {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
+            opacity: 0;
+            transition: all 0.3s ease;
         }
-        
-        .camera-buttons {
-            flex-wrap: wrap;
-            gap: 1rem !important;
+        .prediction-overlay.accident {
+            background-color: rgba(239, 68, 68, 0.8); /* danger color */
+            opacity: 1;
         }
-        
-        @media (max-width: 768px) {
-            .realtime-container {
-                padding: 1rem;
-            }
-            
-            .camera-feed-area {
-                /* FIX: Changed height to min-height */
-                min-height: 280px;
-                margin: 1rem auto 0;
-            }
-            
-            .camera-buttons {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .camera-buttons .btn {
-                width: 200px;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .camera-feed-area {
-                /* FIX: Changed height to min-height */
-                min-height: 250px;
-                padding: 2rem 1rem;
-            }
-            
-            .camera-buttons .btn {
-                width: 180px;
-                padding: 0.75rem 1rem;
-            }
+        .prediction-overlay.normal {
+            background-color: rgba(16, 185, 129, 0.8); /* success color */
+            opacity: 1;
         }
     </style>
 
     <script src="assets/js/script.js"></script>
-
     <script>
-        let isDetectionActive = false;
+        const video = document.getElementById('videoFeed');
+        const canvas = document.getElementById('canvas');
+        const context = canvas.getContext('2d');
+        const overlay = document.getElementById('predictionOverlay');
+        const detectionBtn = document.getElementById('detection-btn');
 
-        function startDetection(event) {
-            isDetectionActive = !isDetectionActive;
-            const btn = event.currentTarget;
-            const cameraArea = document.getElementById('camera-feed-area');
+        let isDetecting = false;
+        let detectionInterval;
+        let stream;
 
-            if (isDetectionActive) {
-                btn.innerHTML = '<i class="fas fa-pause"></i> Stop Detection';
-                btn.classList.remove('btn-primary');
-                btn.classList.add('btn-danger');
+        const API_URL = "https://huggingface.co/spaces/AzhaanGlitch/smart-accident-detector-real_time";
 
-                // Simulate camera feed
-                cameraArea.innerHTML = `
-                    <div style="position: relative; width:100%; height: 100%; background: #000; display: flex; align-items: center; justify-content: center; border-radius: 16px;">
-                        <div style="text-align: center; color: var(--primary-color);">
-                            <div style="font-size: 4rem; margin-bottom: 1rem;"></div>
-                            <h4 style="font-weight: 700; letter-spacing: 1px;">LIVE FEED ACTIVE</h4>
-                            <p style="color: var(--text-secondary);">Monitoring for accidents...</p>
-                            <div style="position: absolute; top: 20px; left: 20px; background: var(--danger-color); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">
-                                ● REC
-                            </div>
-                            <div id="live-time" style="position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.5); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem;">
-                                ${new Date().toLocaleTimeString()}
-                            </div>
-                        </div>
-                    </div>
-                `;
-                showNotification('Live detection started.', 'success');
-                startSimulation();
+        async function startDetection() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+                isDetecting = true;
+                detectionBtn.innerHTML = '<i class="fas fa-pause"></i> Stop Detection';
+                detectionBtn.classList.add('btn-danger');
+
+                // Start sending frames for prediction every second (1000ms)
+                detectionInterval = setInterval(predictFrame, 1000);
+            } catch (err) {
+                console.error("Error accessing camera:", err);
+                showNotification("Could not access camera. Please grant permission.", "error");
+            }
+        }
+
+        function stopDetection() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+            clearInterval(detectionInterval);
+            isDetecting = false;
+            video.srcObject = null;
+            detectionBtn.innerHTML = '<i class="fas fa-play"></i> Start Detection';
+            detectionBtn.classList.remove('btn-danger');
+            overlay.className = 'prediction-overlay';
+            overlay.textContent = '';
+        }
+
+        function toggleDetection() {
+            if (isDetecting) {
+                stopDetection();
             } else {
-                btn.innerHTML = '<i class="fas fa-play"></i> Start Detection';
-                btn.classList.remove('btn-danger');
-                btn.classList.add('btn-primary');
-
-                cameraArea.innerHTML = `
-                    <div class="text-center">
-                        <i class="fas fa-video fa-3x mb-4"></i>
-                        <h5>Start Camera Detection</h5>
-                        <p class="mb-4">Click "Start Detection" to begin monitoring the live feed.</p>
-                        <div class="d-flex gap-3 justify-content-center camera-buttons">
-                            <button class="btn btn-primary px-4" id="detection-btn" onclick="startDetection(event)">
-                                <i class="fas fa-play"></i> Start Detection
-                            </button>
-                            <button class="btn btn-outline-primary px-4" onclick="testCamera()">
-                                <i class="fas fa-cogs"></i> Test Camera
-                            </button>
-                        </div>
-                    </div>
-                `;
-                showNotification('Live detection stopped.', 'info');
-                stopSimulation();
+                startDetection();
             }
         }
 
-        function testCamera() {
-            showNotification('Camera test successful! Status: Connected.', 'success');
-        }
+        async function predictFrame() {
+            if (!isDetecting) return;
 
-        let simulationInterval;
+            // Set canvas size to match video
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            
+            // Draw the current video frame to the canvas
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-        function startSimulation() {
-            simulationInterval = setInterval(() => {
-                // Occasionally simulate an incident detection
-                if (Math.random() < 0.05) { // 5% chance per second
-                    showNotification('Potential accident detected!', 'error');
+            // Get the image data from the canvas
+            const imageData = canvas.toDataURL('image/jpeg');
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ image: imageData }),
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.statusText}`);
                 }
-                updateLiveTime();
-            }, 1000);
-        }
 
-        function stopSimulation() {
-            if (simulationInterval) {
-                clearInterval(simulationInterval);
+                const result = await response.json();
+                updateOverlay(result);
+
+            } catch (error) {
+                console.error("Prediction error:", error);
             }
         }
 
-        function updateLiveTime() {
-            const timeElement = document.getElementById('live-time');
-            if (timeElement) {
-                timeElement.textContent = new Date().toLocaleTimeString();
+        function updateOverlay(result) {
+            const confidencePercent = (result.confidence * 100).toFixed(1);
+            overlay.textContent = `${result.prediction} (${confidencePercent}%)`;
+            if (result.prediction === 'Accident') {
+                overlay.className = 'prediction-overlay accident';
+            } else {
+                overlay.className = 'prediction-overlay normal';
             }
         }
-
-        // Initialize the theme on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeTheme();
-            initializeMobileMenu();
-            setActiveNavLink();
-        });
     </script>
 </body>
 
