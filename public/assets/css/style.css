@@ -392,7 +392,7 @@ body {
     line-height: 1.7;
 }
 
-/* FIX: Specific styles for contact page cards */
+/* Page-Specific Component Styles */
 .contact-card .contact-icon {
     color: var(--primary-color);
     transition: var(--transition);
@@ -400,6 +400,12 @@ body {
 
 .contact-card p {
     color: var(--text-secondary);
+    transition: var(--transition);
+}
+
+/* UPDATED FIX: Style for the feature card icons */
+.feature-icon i {
+    color: var(--primary-color);
     transition: var(--transition);
 }
 
