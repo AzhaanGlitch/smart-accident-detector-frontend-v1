@@ -70,7 +70,11 @@
                 <div class="row">
                     <div class="col-12">
                         <div class="camera-container mb-4">
-                            <video id="videoFeed" playsinline autoplay muted style="width: 100%; height: auto; border-radius: 16px;"></video>
+                            <div id="initialState" class="initial-state-overlay">
+                                <i class="fas fa-video fa-3x mb-4"></i>
+                                <h5>Live Camera Feed</h5>
+                            </div>
+                            <video id="videoFeed" playsinline autoplay muted style="width: 100%; height: auto; border-radius: 16px; display: none;"></video>
                             <canvas id="canvas" style="display: none;"></canvas>
                             <div id="predictionOverlay" class="prediction-overlay"></div>
                         </div>
@@ -94,6 +98,16 @@
             border-radius: 16px;
             overflow: hidden;
             border: 1px solid var(--border-color);
+            /* Ensure the container has a minimum height */
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        /* Style for the initial placeholder text */
+        .initial-state-overlay {
+            color: var(--text-secondary);
+            text-align: center;
         }
         .prediction-overlay {
             position: absolute;
@@ -108,14 +122,19 @@
             text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
             opacity: 0;
             transition: all 0.3s ease;
+            pointer-events: none; /* Make sure it doesn't block video interaction */
+        }
+        .prediction-overlay.visible {
+            opacity: 1;
         }
         .prediction-overlay.accident {
             background-color: rgba(239, 68, 68, 0.8); /* danger color */
-            opacity: 1;
         }
         .prediction-overlay.normal {
             background-color: rgba(16, 185, 129, 0.8); /* success color */
-            opacity: 1;
+        }
+        .prediction-overlay.predicting {
+            background-color: rgba(59, 130, 246, 0.8); /* primary color */
         }
     </style>
 
@@ -126,26 +145,34 @@
         const context = canvas.getContext('2d');
         const overlay = document.getElementById('predictionOverlay');
         const detectionBtn = document.getElementById('detection-btn');
+        const initialState = document.getElementById('initialState');
 
         let isDetecting = false;
         let detectionInterval;
         let stream;
 
-        const API_URL = "https://huggingface.co/spaces/AzhaanGlitch/smart-accident-detector-real_time";
+        // FIX 2: Correct the API URL to point to the API endpoint, not the web page
+        const API_URL = "https://azhaanglitch-smart-accident-detector-real-time.hf.space/predict";
 
         async function startDetection() {
             try {
+                // MODIFIED: Hide initial state and show video
+                initialState.style.display = 'none';
+                video.style.display = 'block';
+
                 stream = await navigator.mediaDevices.getUserMedia({ video: true });
                 video.srcObject = stream;
                 isDetecting = true;
                 detectionBtn.innerHTML = '<i class="fas fa-pause"></i> Stop Detection';
                 detectionBtn.classList.add('btn-danger');
 
-                // Start sending frames for prediction every second (1000ms)
-                detectionInterval = setInterval(predictFrame, 1000);
+                detectionInterval = setInterval(predictFrame, 1000); // Send frame every second
             } catch (err) {
                 console.error("Error accessing camera:", err);
                 showNotification("Could not access camera. Please grant permission.", "error");
+                // MODIFIED: If camera fails, revert to initial state
+                initialState.style.display = 'flex';
+                video.style.display = 'none';
             }
         }
 
@@ -160,6 +187,10 @@
             detectionBtn.classList.remove('btn-danger');
             overlay.className = 'prediction-overlay';
             overlay.textContent = '';
+            
+            // MODIFIED: Hide video and show initial state
+            video.style.display = 'none';
+            initialState.style.display = 'flex';
         }
 
         function toggleDetection() {
@@ -171,17 +202,16 @@
         }
 
         async function predictFrame() {
-            if (!isDetecting) return;
+            if (!isDetecting || video.readyState < 2) return;
 
-            // Set canvas size to match video
+            // FIX 3: Show "Predicting..." feedback to the user
+            overlay.textContent = 'Predicting...';
+            overlay.className = 'prediction-overlay predicting visible';
+
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
-            
-            // Draw the current video frame to the canvas
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-            // Get the image data from the canvas
-            const imageData = canvas.toDataURL('image/jpeg');
+            const imageData = canvas.toDataURL('image/jpeg', 0.8); // Use JPEG with quality for faster uploads
 
             try {
                 const response = await fetch(API_URL, {
@@ -199,6 +229,9 @@
 
             } catch (error) {
                 console.error("Prediction error:", error);
+                // MODIFIED: Show an error message in the overlay
+                overlay.textContent = 'Connection Lost';
+                overlay.className = 'prediction-overlay accident visible';
             }
         }
 
@@ -206,9 +239,9 @@
             const confidencePercent = (result.confidence * 100).toFixed(1);
             overlay.textContent = `${result.prediction} (${confidencePercent}%)`;
             if (result.prediction === 'Accident') {
-                overlay.className = 'prediction-overlay accident';
+                overlay.className = 'prediction-overlay accident visible';
             } else {
-                overlay.className = 'prediction-overlay normal';
+                overlay.className = 'prediction-overlay normal visible';
             }
         }
     </script>
