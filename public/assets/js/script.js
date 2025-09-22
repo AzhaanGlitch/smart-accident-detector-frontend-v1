@@ -343,18 +343,44 @@ function setActiveNavLink() {
     });
 }
 
-// Contact form submission (for contact.html)
-function submitForm(event) {
+// UPDATED Contact form submission (for contact.html)
+async function submitForm(event) {
     event.preventDefault();
-    
-    const name = document.getElementById('name').value;
-    const email = document.getElementById('email').value;
-    const subject = document.getElementById('subject').value;
-    const message = document.getElementById('message').value;
-    
-    // Simulate form submission
-    showNotification('Message sent successfully! We\'ll get back to you soon.', 'success');
-    
-    // Reset form
-    document.getElementById('contactForm').reset();
+    const form = event.target;
+    const data = new FormData(form);
+    const submitButton = form.querySelector('button[type="submit"]');
+
+    // Show loading state
+    const originalButtonText = submitButton.innerHTML;
+    submitButton.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>Sending...`;
+    submitButton.disabled = true;
+
+    try {
+        const response = await fetch(form.action, {
+            method: form.method,
+            body: data,
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+
+        if (response.ok) {
+            showNotification('Message sent successfully! We\'ll get back to you soon.', 'success');
+            form.reset();
+        } else {
+            const responseData = await response.json();
+            if (Object.hasOwn(responseData, 'errors')) {
+                const errorMessage = responseData.errors.map(error => error.message).join(", ");
+                showNotification(`Error: ${errorMessage}`, 'error');
+            } else {
+                showNotification('Oops! There was a problem submitting your form.', 'error');
+            }
+        }
+    } catch (error) {
+        showNotification('An error occurred. Please check your connection and try again.', 'error');
+    } finally {
+        // Restore button state
+        submitButton.innerHTML = originalButtonText;
+        submitButton.disabled = false;
+    }
 }
