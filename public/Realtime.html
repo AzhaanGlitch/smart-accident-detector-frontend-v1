@@ -98,13 +98,11 @@
             border-radius: 16px;
             overflow: hidden;
             border: 1px solid var(--border-color);
-            /* Ensure the container has a minimum height */
             min-height: 400px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        /* Style for the initial placeholder text */
         .initial-state-overlay {
             color: var(--text-secondary);
             text-align: center;
@@ -122,19 +120,19 @@
             text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
             opacity: 0;
             transition: all 0.3s ease;
-            pointer-events: none; /* Make sure it doesn't block video interaction */
+            pointer-events: none;
         }
         .prediction-overlay.visible {
             opacity: 1;
         }
         .prediction-overlay.accident {
-            background-color: rgba(239, 68, 68, 0.8); /* danger color */
+            background-color: rgba(239, 68, 68, 0.8);
         }
         .prediction-overlay.normal {
-            background-color: rgba(16, 185, 129, 0.8); /* success color */
+            background-color: rgba(16, 185, 129, 0.8);
         }
         .prediction-overlay.predicting {
-            background-color: rgba(59, 130, 246, 0.8); /* primary color */
+            background-color: rgba(59, 130, 246, 0.8);
         }
     </style>
 
@@ -151,12 +149,10 @@
         let detectionInterval;
         let stream;
 
-        // FIX 2: Correct the API URL to point to the API endpoint, not the web page
         const API_URL = "https://azhaanglitch-smart-accident-detector-real-time.hf.space/predict";
 
         async function startDetection() {
             try {
-                // MODIFIED: Hide initial state and show video
                 initialState.style.display = 'none';
                 video.style.display = 'block';
 
@@ -166,12 +162,11 @@
                 detectionBtn.innerHTML = '<i class="fas fa-pause"></i> Stop Detection';
                 detectionBtn.classList.add('btn-danger');
 
-                detectionInterval = setInterval(predictFrame, 1000); // Send frame every second
+                detectionInterval = setInterval(predictFrame, 1000);
             } catch (err) {
                 console.error("Error accessing camera:", err);
                 showNotification("Could not access camera. Please grant permission.", "error");
-                // MODIFIED: If camera fails, revert to initial state
-                initialState.style.display = 'flex';
+                initialState.style.display = 'block'; // CORRECTED
                 video.style.display = 'none';
             }
         }
@@ -188,9 +183,8 @@
             overlay.className = 'prediction-overlay';
             overlay.textContent = '';
             
-            // MODIFIED: Hide video and show initial state
             video.style.display = 'none';
-            initialState.style.display = 'flex';
+            initialState.style.display = 'block'; // CORRECTED
         }
 
         function toggleDetection() {
@@ -204,14 +198,13 @@
         async function predictFrame() {
             if (!isDetecting || video.readyState < 2) return;
 
-            // FIX 3: Show "Predicting..." feedback to the user
             overlay.textContent = 'Predicting...';
             overlay.className = 'prediction-overlay predicting visible';
 
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
-            const imageData = canvas.toDataURL('image/jpeg', 0.8); // Use JPEG with quality for faster uploads
+            const imageData = canvas.toDataURL('image/jpeg', 0.8);
 
             try {
                 const response = await fetch(API_URL, {
@@ -229,7 +222,6 @@
 
             } catch (error) {
                 console.error("Prediction error:", error);
-                // MODIFIED: Show an error message in the overlay
                 overlay.textContent = 'Connection Lost';
                 overlay.className = 'prediction-overlay accident visible';
             }
