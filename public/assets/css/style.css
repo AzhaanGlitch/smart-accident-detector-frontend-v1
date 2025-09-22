@@ -162,7 +162,7 @@ body {
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    z-index: 1000;
+    z-index: 1002; /* FIX: Increased z-index to appear above mobile header */
     backdrop-filter: blur(12px);
     transition: var(--transition);
 }
@@ -390,6 +390,17 @@ body {
 .card-text {
     color: var(--text-secondary) !important;
     line-height: 1.7;
+}
+
+/* FIX: Specific styles for contact page cards */
+.contact-card .contact-icon {
+    color: var(--primary-color);
+    transition: var(--transition);
+}
+
+.contact-card p {
+    color: var(--text-secondary);
+    transition: var(--transition);
 }
 
 /* Upload Area */
@@ -683,7 +694,6 @@ body {
         transform: translateX(-100%);
         transition: transform 0.3s ease;
         width: 280px;
-        z-index: 1000;
     }
     
     /* Show sidebar when active */
