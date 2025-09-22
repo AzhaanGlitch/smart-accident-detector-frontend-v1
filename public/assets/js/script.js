@@ -35,6 +35,115 @@ function applyTheme() {
     }
 }
 
+// Mobile Menu Management
+function initializeMobileMenu() {
+    // Create mobile header if it doesn't exist
+    if (!document.querySelector('.mobile-header')) {
+        createMobileHeader();
+    }
+    
+    // Create mobile overlay if it doesn't exist
+    if (!document.querySelector('.mobile-overlay')) {
+        createMobileOverlay();
+    }
+    
+    // Add event listeners
+    setupMobileMenuEvents();
+}
+
+function createMobileHeader() {
+    const mobileHeader = document.createElement('div');
+    mobileHeader.className = 'mobile-header';
+    mobileHeader.innerHTML = `
+        <button class="hamburger-menu" onclick="toggleMobileMenu()">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="mobile-logo">
+            <img src="assets/drone-logo.jpg" alt="Logo">
+            <h6>SMART ACCIDENT<br>DETECTOR</h6>
+        </div>
+        <div></div>
+    `;
+    
+    document.body.prepend(mobileHeader);
+}
+
+function createMobileOverlay() {
+    const overlay = document.createElement('div');
+    overlay.className = 'mobile-overlay';
+    overlay.onclick = closeMobileMenu;
+    document.body.appendChild(overlay);
+}
+
+function setupMobileMenuEvents() {
+    // Close menu when clicking nav links on mobile
+    const navLinks = document.querySelectorAll('.sidebar .nav-link');
+    navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            if (window.innerWidth <= 768) {
+                closeMobileMenu();
+            }
+        });
+    });
+    
+    // Handle window resize
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 768) {
+            closeMobileMenu();
+        }
+    });
+}
+
+function toggleMobileMenu() {
+    const sidebar = document.querySelector('.sidebar');
+    const overlay = document.querySelector('.mobile-overlay');
+    const hamburgerIcon = document.querySelector('.hamburger-menu i');
+    
+    if (sidebar && overlay) {
+        const isActive = sidebar.classList.contains('mobile-active');
+        
+        if (isActive) {
+            closeMobileMenu();
+        } else {
+            openMobileMenu();
+        }
+    }
+}
+
+function openMobileMenu() {
+    const sidebar = document.querySelector('.sidebar');
+    const overlay = document.querySelector('.mobile-overlay');
+    const hamburgerIcon = document.querySelector('.hamburger-menu i');
+    
+    if (sidebar && overlay) {
+        sidebar.classList.add('mobile-active');
+        overlay.classList.add('active');
+        if (hamburgerIcon) {
+            hamburgerIcon.className = 'fas fa-times';
+        }
+        
+        // Prevent body scroll when menu is open
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function closeMobileMenu() {
+    const sidebar = document.querySelector('.sidebar');
+    const overlay = document.querySelector('.mobile-overlay');
+    const hamburgerIcon = document.querySelector('.hamburger-menu i');
+    
+    if (sidebar && overlay) {
+        sidebar.classList.remove('mobile-active');
+        overlay.classList.remove('active');
+        if (hamburgerIcon) {
+            hamburgerIcon.className = 'fas fa-bars';
+        }
+        
+        // Restore body scroll
+        document.body.style.overflow = '';
+    }
+}
+
 // Enhanced File Upload Functionality
 document.addEventListener('DOMContentLoaded', function() {
     const fileInput = document.getElementById('fileInput');
@@ -49,12 +158,26 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     initializeTheme();
+    initializeMobileMenu();
     setActiveNavLink();
 });
 
-function handleDragEnter(e) { e.preventDefault(); e.stopPropagation(); document.querySelector('.upload-area').classList.add('drag-active'); }
-function handleDragOver(e) { e.preventDefault(); e.stopPropagation(); }
-function handleDragLeave(e) { e.preventDefault(); e.stopPropagation(); document.querySelector('.upload-area').classList.remove('drag-active'); }
+function handleDragEnter(e) { 
+    e.preventDefault(); 
+    e.stopPropagation(); 
+    document.querySelector('.upload-area').classList.add('drag-active'); 
+}
+
+function handleDragOver(e) { 
+    e.preventDefault(); 
+    e.stopPropagation(); 
+}
+
+function handleDragLeave(e) { 
+    e.preventDefault(); 
+    e.stopPropagation(); 
+    document.querySelector('.upload-area').classList.remove('drag-active'); 
+}
 
 function handleDrop(e) {
     e.preventDefault();
@@ -91,13 +214,13 @@ function updateUploadAreaSuccess(fileName) {
     }
 }
 
-// ===== Auto-scroll helper =====
+// Auto-scroll helper
 function smoothScrollIntoView(el) {
     if (!el) return;
     el.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
-// ================== RUN TEST (BACKEND INTEGRATION) - MODIFIED ==================
+// RUN TEST (BACKEND INTEGRATION)
 async function runTest() {
     const fileInput = document.getElementById('fileInput');
     const uploadBtn = document.querySelector('.btn-primary.btn-lg');
@@ -144,7 +267,7 @@ async function runTest() {
         }
 
         const result = await response.json();
-        resultsGrid.innerHTML = ''; // Clear loading text
+        resultsGrid.innerHTML = '';
 
         let outcomes = {};
         if (result.error) {
@@ -152,7 +275,6 @@ async function runTest() {
         } else {
             const finalModel = result.final_model || {};
 
-            // 1. Determine Accident Status based on final_model.prediction
             let accidentStatus = 'Undetermined';
             if (finalModel.prediction === 'accident') {
                 accidentStatus = 'Accident Detected';
@@ -160,11 +282,8 @@ async function runTest() {
                 accidentStatus = 'No Accident';
             }
 
-            // 2. Format confidence score to two decimal places.
-            // This assumes the backend is sending a number that is already a percentage value (e.g., 76.43)
             const finalConfidence = (finalModel.confidence || 0).toFixed(2);
 
-            // 3. Create the two result boxes
             outcomes = {
                 'Accident Status': accidentStatus,
                 'Confidence Score': `${finalConfidence}%`,
@@ -222,4 +341,20 @@ function setActiveNavLink() {
             link.classList.add('active');
         }
     });
+}
+
+// Contact form submission (for contact.html)
+function submitForm(event) {
+    event.preventDefault();
+    
+    const name = document.getElementById('name').value;
+    const email = document.getElementById('email').value;
+    const subject = document.getElementById('subject').value;
+    const message = document.getElementById('message').value;
+    
+    // Simulate form submission
+    showNotification('Message sent successfully! We\'ll get back to you soon.', 'success');
+    
+    // Reset form
+    document.getElementById('contactForm').reset();
 }
