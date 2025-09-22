@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Accident Detector - Contact</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="assets/css/style.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="wrapper">
+        <!-- Sidebar -->
+        <nav id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <div class="d-flex align-items-center">
+                    <div class="logo-icon">
+                        <img src="/public/assets/drone-logo.jpg" alt="Logo-icon" style="width: 65px; height: 65px; border-radius: 50%;">
+                    </div>
+                    <div class="ms-3">
+                        <h5 class="mb-0 text-white fw-bold">SMART<br>ACCIDENT<br>DETECTOR</h5>
+                        <small class="text-muted">Detect.Alert.Protect.</small>
+                    </div>
+                </div>
+            </div>
+
+            <ul class="nav flex-column mt-4">
+                <li class="nav-item">
+                    <a class="nav-link" href="base.html">
+                        <i class="fas fa-tachometer-alt"></i> DASHBOARD
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="Realtime.html">
+                        <i class="fas fa-envelope"></i> REAL-TIME
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="features.html">
+                        <i class="fas fa-bolt"></i> FEATURES
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="team.html">
+                        <i class="fas fa-users"></i> TEAM
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="contact.html">
+                        <i class="fas fa-envelope"></i> CONTACT
+                    </a>
+                </li>
+
+            </ul>
+
+            <div class="sidebar-footer">
+                <button class="btn btn-outline-light btn-sm w-100 mb-2" onclick="toggleTheme()">
+                    <i id="theme-icon" class="fas fa-sun"></i> <span id="theme-text">Light Mode</span>
+                </button>
+                <button class="btn btn-danger btn-sm w-100">
+                    <i class="fas fa-sign-out-alt"></i> Log Out
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="page-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 class="page-title">Get In Touch</h1>
+                        <p class="page-subtitle">We're here to help and answer your questions</p>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <span class="badge bg-success me-3">
+                            <i class="fas fa-circle me-1"></i> Online
+                        </span>
+                       
+                    </div>
+                </div>
+            </header>
+
+            <!-- Contact Content -->
+            <div class="container-fluid">
+                <div class="row g-4">
+                    <!-- Contact Info -->
+                    <div class="col-lg-6">
+                        <div class="row g-4">
+                            <div class="col-12">
+                                <div class="card contact-card">
+                                    <div class="card-body">
+                                        <div class="contact-icon mb-3">
+                                            <i class="fas fa-envelope fa-2x"></i>
+                                        </div>
+                                        <h5 class="card-title">Email</h5>
+                                        <p class="mb-1">azhaanalisiddiqui15@gmail.com</p>
+                                        <p class="mb-0">anshumanmohapatra2005@gmail.com</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="card contact-card">
+                                    <div class="card-body">
+                                        <div class="contact-icon mb-3">
+                                            <i class="fas fa-phone fa-2x"></i>
+                                        </div>
+                                        <h5 class="card-title">Phone</h5>
+                                        <p class="mb-1">+91 7983595318</p>
+                                        <p class="mb-0">+91 8658987122</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="card contact-card">
+                                    <div class="card-body">
+                                        <div class="contact-icon mb-3">
+                                            <i class="fas fa-map-marker-alt fa-2x"></i>
+                                        </div>
+                                        <h5 class="card-title">Address</h5>
+                                        <p class="mb-1">VIT Bhopal University</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contact Form -->
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title mb-4">Send us a message</h4>
+
+                                <form id="contactForm" onsubmit="submitForm(event)">
+                                    <div class="mb-3">
+                                        <label for="name" class="form-label">Name</label>
+                                        <input type="text" class="form-control" id="name" required>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="email" class="form-label">Email</label>
+                                        <input type="email" class="form-control" id="email" required>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="subject" class="form-label">Subject</label>
+                                        <select class="form-select" id="subject">
+                                            <option value="general">General Inquiry</option>
+                                            <option value="support">Technical Support</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <label for="message" class="form-label">Message</label>
+                                        <textarea class="form-control" id="message" rows="5" required></textarea>
+                                    </div>
+
+                                    <button type="submit" class="btn btn-primary btn-lg w-100">
+                                        <i class="fas fa-paper-plane me-2"></i> Send Message
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/script.js"></script>
+</body>
+
+</html>

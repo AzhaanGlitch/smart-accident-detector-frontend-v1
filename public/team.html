@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Accident Detector - Team</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="assets/css/style.css" rel="stylesheet">
+    
+<style>
+    /* Team Card Styles */
+    .team-card {
+        transition: all 0.3s ease;
+        height: 320px !important;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .team-card:hover {
+        transform: translateY(-10px);
+        height: 400px !important;
+    }
+
+    .team-avatar {
+        width: 100px !important;
+        height: 100px !important;
+        border-radius: 50%;
+        margin: 0 auto;
+        background-size: cover !important;
+        background-position: center !important;
+        background-repeat: no-repeat !important;
+        border: 3px solid #007bff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #007bff;
+        font-size: 2rem;
+        position: relative;
+    }
+
+    /* --- SIMPLIFIED SECTION --- */
+    /* We set the image background here and it should persist on hover */
+    .team-avatar.avatar-azhaan {
+        background: url('assets/azhaan.jpg') center/cover no-repeat !important;
+    }
+    .team-avatar.avatar-anshuman {
+        background: url('assets/anshuman.jpg') center/cover no-repeat !important;
+    }
+    .team-avatar.avatar-shresth {
+        background: url('assets/shresth.jpg') center/cover no-repeat !important;
+    }
+    .team-avatar.avatar-adhya {
+        background: url('assets/adhya.jpg') center/cover no-repeat !important;
+    }
+    .team-avatar.avatar-arpita {
+        background: url('assets/arpita.png') center/cover no-repeat !important;
+    }
+    /* We have REMOVED the specific hover rules for each avatar,
+       as they are no longer needed. The transform is handled by your main style.css */
+
+    /* Hide icons when background image is present */
+    .team-avatar.avatar-azhaan i,
+    .team-avatar.avatar-anshuman i,
+    .team-avatar.avatar-shresth i,
+    .team-avatar.avatar-adhya i,
+    .team-avatar.avatar-arpita i {
+        display: none !important;
+    }
+
+    /* Social links initially hidden */
+    .social-links {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.3s ease;
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%) translateY(20px);
+        width: 100%;
+        text-align: center;
+    }
+
+    .team-card:hover .social-links {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+
+    /* Card content positioning */
+    .team-card .card-body {
+        position: relative;
+        height: 100%;
+        padding-bottom: 80px;
+    }
+
+    .team-card .card-text {
+        margin-bottom: 20px;
+    }
+
+    /* Social button styling */
+    .social-links .btn {
+        margin: 0 5px;
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Fallback for images that fail to load */
+    .team-avatar:not([class*="avatar-"]) {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .team-avatar::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        z-index: -1;
+    }
+</style>
+</head>
+
+<body>
+    <div class="wrapper">
+        <!-- Sidebar -->
+        <nav id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <div class="d-flex align-items-center">
+                    <div class="logo-icon">
+                        <img src="/public/assets/drone-logo.jpg" alt="Logo-icon" style="width: 65px; height: 65px; border-radius: 50%;">
+                    </div>
+                    <div class="ms-3">
+                        <h5 class="mb-0 text-white fw-bold">SMART<br>ACCIDENT<br>DETECTOR</h5>
+                        <small class="text-muted">Detect.Alert.Protect.</small>
+                    </div>
+                </div>
+            </div>
+
+            <ul class="nav flex-column mt-4">
+                <li class="nav-item">
+                    <a class="nav-link" href="base.html">
+                        <i class="fas fa-tachometer-alt"></i> DASHBOARD
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="Realtime.html">
+                        <i class="fas fa-envelope"></i> REAL-TIME
+                    </a>
+                </li>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="features.html">
+                        <i class="fas fa-bolt"></i> FEATURES
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="team.html">
+                        <i class="fas fa-users"></i> TEAM
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="contact.html">
+                        <i class="fas fa-envelope"></i> CONTACT
+                    </a>
+                </li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <button class="btn btn-outline-light btn-sm w-100 mb-2" onclick="toggleTheme()">
+                    <i id="theme-icon" class="fas fa-sun"></i> <span id="theme-text">Light Mode</span>
+                </button>
+                <button class="btn btn-danger btn-sm w-100">
+                    <i class="fas fa-sign-out-alt"></i> Log Out
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="page-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 class="page-title">Our Team</h1>
+                        <p class="page-subtitle">Meet the experts behind Smart Accident Detector</p>
+                    </div>
+                    <div class="d-flex align-items-center">                    
+                        <span class="badge bg-success me-3">
+                            <i class="fas fa-circle me-1"></i> Online
+                        </span>             
+                    </div>
+                </div>
+            </header>
+
+            <!-- Team Content -->
+            <div class="container-fluid" style="margin-top: 50px;">
+                <!-- First Row - 3 cards -->
+                <div class="row g-4 mb-4 justify-content-center">
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card team-card h-100">
+                            <div class="card-body text-center">
+                                <div class="team-avatar avatar-azhaan mb-3">
+                                    <i class="fas fa-user-tie"></i>
+                                </div>
+                                <h5 class="card-title">Azhaan Ali Siddiqui</h5>
+                                <p class="text-primary mb-3">24BSA10234 | CSE | CLOUD</p>
+                                <p class="card-text">Frontend | Backend | ML | Flask | Version Controlling | Deployment</p>
+                                <div class="social-links">
+                                    <a href="https://www.linkedin.com/in/azhaanalisiddiqui/" class="btn btn-outline-primary btn-sm">
+                                        <i class="fab fa-linkedin"></i>
+                                    </a>
+                                    <a href="https://github.com/AzhaanGlitch" class="btn btn-outline-primary btn-sm">
+                                        <i class="fab fa-github"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card team-card h-100">
+                            <div class="card-body text-center">
+                                <div class="team-avatar avatar-anshuman mb-3">
+                                    <i class="fas fa-code"></i>
+                                </div>
+                                <h5 class="card-title">Anshuman Mohaptra</h5>
+                                <p class="text-primary mb-3">24BSA10287 | CSE | CLOUD</p>
+                                <p class="card-text">Frontend</p>
+                                <div class="social-links">
+                                    <a href="https://www.linkedin.com/in/anshuman-mohapatra-3aab24325?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app"
+                                        class="btn btn-outline-primary btn-sm">
+                                        <i class="fab fa-linkedin"></i>
+                                    </a>
+                                    <a href="https://github.com/AnshumanSketch" class="btn btn-outline-primary btn-sm">
+                                        <i class="fab fa-github"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card team-card h-100">
+                            <div class="card-body text-center">
+                                <div class="team-avatar avatar-shresth mb-3">
+                                    <i class="fas fa-shield-alt"></i>
+                                </div>
+                                <h5 class="card-title">Shresth Bhargava</h5>
+                                <p class="text-primary mb-3">24BSA10161 | CSE | CLOUD</p>
+                                <p class="card-text">Frontend | UI | Authorization</p>
+                                <div class="social-links">
+                                    <a href="https://www.linkedin.com/in/shresth-bhargava/"
+                                        class="btn btn-outline-primary btn-sm">
+                                        <i class="fab fa-linkedin"></i>
+                                    </a>
+                                    <a href="https://github.com/shresthbhargava" class="btn btn-outline-primary btn-sm">
+                                        <i class="fab fa-github"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Second Row - 2 cards centered -->
+                <div class="row g-4 justify-content-center">
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card team-card h-100">
+                            <div class="card-body text-center">
+                                <div class="team-avatar avatar-adhya mb-3">
+                                    <i class="fas fa-mobile-alt"></i>
+                                </div>
+                                <h5 class="card-title">Adhya Sparsh</h5>
+                                <p class="text-primary mb-3">24BSA10319 | CSE | CLOUD</p>
+                                <p class="card-text">Machine Learning</p>
+                                <div class="social-links">
+                                    <a href="#" class="btn btn-outline-primary btn-sm">
+                                        <i class="fab fa-linkedin"></i>
+                                    </a>
+                                    <a href="#" class="btn btn-outline-primary btn-sm">
+                                        <i class="fab fa-github"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card team-card h-100">
+                            <div class="card-body text-center">
+                                <div class="team-avatar avatar-arpita mb-3">
+                                    <i class="fas fa-mobile-alt"></i>
+                                </div>
+                                <h5 class="card-title">Arpita</h5>
+                                <p class="text-primary mb-3">24BSA10276 | CSE | CLOUD</p>
+                                <p class="card-text">Content</p>
+                                <div class="social-links">
+                                    <a href="http://www.linkedin.com/in/arpitec23" class="btn btn-outline-primary btn-sm">
+                                        <i class="fab fa-linkedin"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/script.js"></script>
+</body>
+
+</html>
