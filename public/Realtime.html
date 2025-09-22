@@ -68,15 +68,15 @@
                 </div>
             </header>
 
-            <div class="container-fluid p-4">
+            <div class="container-fluid realtime-container">
                 <div class="row">
                     <div class="col-12">
-                        <div id="camera-feed-area" class="upload-area" style="width: 1100px; height: 320px; margin-left: 50px; margin-top: 50px;">
+                        <div id="camera-feed-area" class="upload-area camera-feed-area">
                             <div class="text-center">
                                 <i class="fas fa-video fa-3x mb-4"></i>
                                 <h5>Start Camera Detection</h5> 
                                 <p class="mb-4">Click "Start Detection" to begin monitoring the live feed.</p>
-                                <div class="d-flex gap-3 justify-content-center">
+                                <div class="d-flex gap-3 justify-content-center camera-buttons">
                                     <button class="btn btn-primary px-4" id="detection-btn" onclick="startDetection(event)">
                                         <i class="fas fa-play"></i> Start Detection
                                     </button>
@@ -92,7 +92,58 @@
         </main>
     </div>
 
-    <script src="script.js"></script>
+    <style>
+        /* Realtime page specific responsive styles */
+        .realtime-container {
+            padding: 2rem;
+        }
+        
+        .camera-feed-area {
+            width: 100%;
+            max-width: 1100px;
+            height: 320px;
+            margin: 50px auto 0;
+        }
+        
+        .camera-buttons {
+            flex-wrap: wrap;
+            gap: 1rem !important;
+        }
+        
+        @media (max-width: 768px) {
+            .realtime-container {
+                padding: 1rem;
+            }
+            
+            .camera-feed-area {
+                height: 280px;
+                margin: 1rem auto 0;
+            }
+            
+            .camera-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .camera-buttons .btn {
+                width: 200px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .camera-feed-area {
+                height: 250px;
+                padding: 2rem 1rem;
+            }
+            
+            .camera-buttons .btn {
+                width: 180px;
+                padding: 0.75rem 1rem;
+            }
+        }
+    </style>
+
+    <script src="assets/js/script.js"></script>
 
     <script>
         let isDetectionActive = false;
@@ -135,7 +186,7 @@
                         <i class="fas fa-video fa-3x mb-4"></i>
                         <h5>Start Camera Detection</h5>
                         <p class="mb-4">Click "Start Detection" to begin monitoring the live feed.</p>
-                        <div class="d-flex gap-3 justify-content-center">
+                        <div class="d-flex gap-3 justify-content-center camera-buttons">
                             <button class="btn btn-primary px-4" id="detection-btn" onclick="startDetection(event)">
                                 <i class="fas fa-play"></i> Start Detection
                             </button>
@@ -180,7 +231,11 @@
         }
 
         // Initialize the theme on page load
-        document.addEventListener('DOMContentLoaded', initializeTheme);
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeTheme();
+            initializeMobileMenu();
+            setActiveNavLink();
+        });
     </script>
 </body>
 
