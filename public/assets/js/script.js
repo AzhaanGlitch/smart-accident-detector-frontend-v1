@@ -13,8 +13,6 @@ function toggleTheme() {
     isDarkMode = !isDarkMode;
     localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
     applyTheme();
-    
-    // Add smooth transition
     document.body.classList.add('theme-transition');
     setTimeout(() => {
         document.body.classList.remove('theme-transition');
@@ -28,20 +26,12 @@ function applyTheme() {
     
     if (isDarkMode) {
         body.setAttribute('data-theme', 'dark');
-        if (themeIcon) {
-            themeIcon.className = 'fas fa-sun';
-        }
-        if (themeText) {
-            themeText.textContent = 'Light Mode';
-        }
+        if (themeIcon) themeIcon.className = 'fas fa-sun';
+        if (themeText) themeText.textContent = 'Light Mode';
     } else {
         body.setAttribute('data-theme', 'light');
-        if (themeIcon) {
-            themeIcon.className = 'fas fa-moon';
-        }
-        if (themeText) {
-            themeText.textContent = 'Dark Mode';
-        }
+        if (themeIcon) themeIcon.className = 'fas fa-moon';
+        if (themeText) themeText.textContent = 'Dark Mode';
     }
 }
 
@@ -51,106 +41,43 @@ document.addEventListener('DOMContentLoaded', function() {
     const uploadArea = document.querySelector('.upload-area');
     
     if (fileInput && uploadArea) {
-        // Handle drag and drop with enhanced animations
         uploadArea.addEventListener('dragenter', handleDragEnter);
         uploadArea.addEventListener('dragover', handleDragOver);
         uploadArea.addEventListener('dragleave', handleDragLeave);
         uploadArea.addEventListener('drop', handleDrop);
-        
-        // Handle file selection
         fileInput.addEventListener('change', handleFileSelect);
     }
     
-    // Initialize theme and set active nav
     initializeTheme();
     setActiveNavLink();
-    addEnhancedAnimations();
 });
 
-function handleDragEnter(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    const uploadArea = document.querySelector('.upload-area');
-    uploadArea.style.borderColor = 'var(--primary-color)';
-    uploadArea.style.backgroundColor = 'rgba(37, 99, 235, 0.1)';
-    uploadArea.style.transform = 'scale(1.02)';
-    uploadArea.classList.add('drag-active');
-}
-
-function handleDragOver(e) {
-    e.preventDefault();
-    e.stopPropagation();
-}
-
-function handleDragLeave(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    // Check if we're actually leaving the upload area
-    const uploadArea = document.querySelector('.upload-area');
-    const rect = uploadArea.getBoundingClientRect();
-    const x = e.clientX;
-    const y = e.clientY;
-    
-    if (x < rect.left || x > rect.right || y < rect.top || y > rect.bottom) {
-        resetUploadAreaStyle();
-    }
-}
+function handleDragEnter(e) { e.preventDefault(); e.stopPropagation(); document.querySelector('.upload-area').classList.add('drag-active'); }
+function handleDragOver(e) { e.preventDefault(); e.stopPropagation(); }
+function handleDragLeave(e) { e.preventDefault(); e.stopPropagation(); document.querySelector('.upload-area').classList.remove('drag-active'); }
 
 function handleDrop(e) {
     e.preventDefault();
     e.stopPropagation();
-    
+    document.querySelector('.upload-area').classList.remove('drag-active');
     const files = e.dataTransfer.files;
-    resetUploadAreaStyle();
-    
-    if (files.length > 0) {
-        handleFiles(files);
-    }
-}
-
-function resetUploadAreaStyle() {
-    const uploadArea = document.querySelector('.upload-area');
-    uploadArea.style.borderColor = 'var(--border-color)';
-    uploadArea.style.backgroundColor = '';
-    uploadArea.style.transform = 'scale(1)';
-    uploadArea.classList.remove('drag-active');
+    if (files.length > 0) handleFiles(files);
 }
 
 function handleFileSelect(e) {
     const files = e.target.files;
-    if (files.length > 0) {
-        handleFiles(files);
-    }
+    if (files.length > 0) handleFiles(files);
 }
 
 function handleFiles(files) {
     const file = files[0];
-    console.log('File selected:', file.name);
-    
-    // Show loading state
-    showLoadingState();
-    
-    setTimeout(() => {
-        // Show success message with animation
-        showNotification(`File ready for testing: ${file.name}`, 'success');
-        
-        // Update upload area with success state
-        updateUploadAreaSuccess(file.name);
-        hideLoadingState();
-    }, 1000);
-}
-
-function showLoadingState() {
-    const uploadArea = document.querySelector('.upload-area');
-    const content = uploadArea.querySelector('.text-center') || uploadArea;
-    content.classList.add('loading');
-}
-
-function hideLoadingState() {
-    const uploadArea = document.querySelector('.upload-area');
-    const content = uploadArea.querySelector('.text-center') || uploadArea;
-    content.classList.remove('loading');
+    const fileInput = document.getElementById('fileInput');
+    // Critical fix: Ensure drag-and-dropped files are added to the file input
+    if (fileInput) {
+        fileInput.files = files; 
+    }
+    updateUploadAreaSuccess(file.name);
+    showNotification(`File ready: ${file.name}`, 'success');
 }
 
 function updateUploadAreaSuccess(fileName) {
@@ -160,249 +87,133 @@ function updateUploadAreaSuccess(fileName) {
     
     if (textElement && icon) {
         textElement.textContent = `Selected: ${fileName}`;
-        textElement.style.color = 'var(--success-color)';
-        icon.className = 'fas fa-check-circle fa-3x';
-        icon.style.color = 'var(--success-color)';
-        
-        // Add success animation
+        icon.className = 'fas fa-check-circle fa-3x text-success';
         uploadArea.style.borderColor = 'var(--success-color)';
-        uploadArea.style.animation = 'pulse 2s infinite';
     }
 }
 
-// Run Test Function --- MODIFIED SECTION
+// ===== Auto-scroll helper =====
+function smoothScrollIntoView(el) {
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+// ================== RUN TEST (BACKEND INTEGRATION) - MODIFIED ==================
 async function runTest() {
     const fileInput = document.getElementById('fileInput');
-    
-    if (!fileInput || !fileInput.files.length) {
-        showNotification('Please select a file first!', 'warning');
+    const uploadBtn = document.querySelector('.btn-primary.btn-lg');
+    const predictionBox = document.getElementById('predictionBox');
+    const resultImage = document.getElementById('resultImage');
+    const resultVideo = document.getElementById('resultVideo');
+    const resultsGrid = document.getElementById('resultsGrid');
+
+    const file = fileInput ? fileInput.files[0] : null;
+    if (!file) {
+        showNotification('Please select a file first.', 'warning');
         return;
     }
-    
-    const file = fileInput.files[0];
-    const formData = new FormData();
-    formData.append('file', file); // The backend likely expects the file under the key 'file'
-    
-    showNotification('Running accident detection test...', 'info');
+
+    // Show loading state
+    uploadBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Processing...';
+    uploadBtn.disabled = true;
+
+    predictionBox.style.display = 'block';
+    resultImage.style.display = 'none';
+    resultVideo.style.display = 'none';
+    resultsGrid.innerHTML = '<div class="loading-text">Analyzing media... This may take a moment.</div>';
+
+    // Display the uploaded media preview
+    const objectURL = URL.createObjectURL(file);
+    if (file.type.startsWith('image')) {
+        resultImage.src = objectURL;
+        resultImage.style.display = 'block';
+    } else if (file.type.startsWith('video')) {
+        resultVideo.src = objectURL;
+        resultVideo.style.display = 'block';
+    }
 
     try {
-        // Use fetch to send the file to your backend
+        const formData = new FormData();
+        formData.append('file', file);
+
         const response = await fetch('https://azhaanglitch-smart-accident-detector-backend-v2.hf.space/predict', {
             method: 'POST',
             body: formData,
         });
 
         if (!response.ok) {
-            // Handle server-side errors (e.g., 500 Internal Server Error)
             throw new Error(`Server responded with status: ${response.status}`);
         }
 
         const result = await response.json();
+        resultsGrid.innerHTML = ''; // Clear loading text
 
-        // Display the prediction from the backend
-        // We assume the backend returns a JSON like { "prediction": "Accident Detected" }
-        const predictionMessage = result.prediction || 'Test completed, but no prediction was returned.';
-        showNotification(predictionMessage, 'success');
+        let outcomes = {};
+        if (result.error) {
+            outcomes = { 'Status': 'Error', 'Message': result.error };
+        } else {
+            const finalModel = result.final_model || {};
+            const bestModel = result.best_model || {};
+            
+            const finalConfidence = (finalModel.confidence ? finalModel.confidence * 100 : 0).toFixed(1);
+            const bestConfidence = (bestModel.confidence ? bestModel.confidence * 100 : 0).toFixed(1);
+
+            outcomes = {
+                'Accident Status': result.accident_detected ? 'Accident Detected' : 'No Accident',
+                'Final Model': `${finalModel.prediction || 'N/A'} (${finalConfidence}%)`,
+                'Best Model': `${bestModel.prediction || 'N/A'} (${bestConfidence}%)`,
+            };
+        }
+
+        Object.entries(outcomes).forEach(([title, value]) => {
+            const card = document.createElement('div');
+            card.className = 'result-card';
+            card.innerHTML = `
+                <div class="result-title">${title}</div>
+                <div class="result-value">${value}</div>
+            `;
+            resultsGrid.appendChild(card);
+        });
 
     } catch (error) {
-        // Handle network errors or issues with the fetch request
-        console.error('Error during test:', error);
-        showNotification('An error occurred while running the test. Please check the console.', 'error');
+        console.error('Error calling backend API:', error);
+        resultsGrid.innerHTML = `
+          <div class="result-card" style="border-color: var(--danger-color); grid-column: 1 / -1;">
+            <div class="result-title">Error</div>
+            <div class="result-value" style="color: var(--danger-color); font-size: 1rem;">
+              Failed to process media. Please try again.
+            </div>
+          </div>
+        `;
+    } finally {
+        uploadBtn.innerHTML = '<i class="fas fa-play me-2"></i> Run Test';
+        uploadBtn.disabled = false;
+        setTimeout(() => smoothScrollIntoView(predictionBox), 200);
     }
-}
-
-// Contact Form Submission
-function submitForm(e) {
-    e.preventDefault();
-    
-    const form = e.target;
-    const formData = new FormData(form);
-    
-    // Get form values
-    const name = document.getElementById('name').value;
-    const email = document.getElementById('email').value;
-    const subject = document.getElementById('subject').value;
-    const message = document.getElementById('message').value;
-    
-    // Basic validation
-    if (!name || !email || !message) {
-        showNotification('Please fill in all required fields!', 'warning');
-        return;
-    }
-    
-    // Simulate form submission
-    showNotification('Sending message...', 'info');
-    
-    setTimeout(() => {
-        showNotification('Message sent successfully! We\'ll get back to you soon.', 'success');
-        form.reset();
-    }, 1500);
 }
 
 // Notification System
 function showNotification(message, type = 'info') {
-    // Remove existing notifications
-    const existingNotification = document.querySelector('.notification');
-    if (existingNotification) {
-        existingNotification.remove();
-    }
-    
-    // Create notification element
+    const existing = document.querySelector('.notification');
+    if (existing) existing.remove();
+
     const notification = document.createElement('div');
-    notification.className = `notification alert alert-${getBootstrapClass(type)} alert-dismissible fade show`;
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        z-index: 9999;
-        min-width: 300px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    `;
-    
-    notification.innerHTML = `
-        ${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    `;
+    const BStype = { success: 'success', warning: 'warning', error: 'danger', info: 'info' }[type] || 'primary';
+    notification.className = `notification alert alert-${BStype} alert-dismissible fade show`;
+    notification.style.cssText = `position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);`;
+    notification.innerHTML = `${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>`;
     
     document.body.appendChild(notification);
-    
-    // Auto-remove after 5 seconds
-    setTimeout(() => {
-        if (notification && notification.parentNode) {
-            notification.remove();
-        }
-    }, 5000);
-}
-
-function getBootstrapClass(type) {
-    switch (type) {
-        case 'success': return 'success';
-        case 'warning': return 'warning';
-        case 'error': return 'danger';
-        case 'info': return 'info';
-        default: return 'primary';
-    }
+    setTimeout(() => { if (notification.parentNode) { notification.remove(); } }, 5000);
 }
 
 // Set Active Navigation Link
 function setActiveNavLink() {
-    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
-    const navLinks = document.querySelectorAll('.sidebar .nav-link');
-    
-    navLinks.forEach(link => {
+    const currentPage = window.location.pathname.split('/').pop() || 'base.html';
+    document.querySelectorAll('.sidebar .nav-link').forEach(link => {
         link.classList.remove('active');
-        const href = link.getAttribute('href');
-        
-        if (href === currentPage || 
-            (currentPage === '' && href === 'index.html') ||
-            (currentPage === 'index.html' && href === 'index.html')) {
+        if (link.getAttribute('href') === currentPage) {
             link.classList.add('active');
         }
     });
-}
-
-// Smooth scrolling for internal links
-document.addEventListener('DOMContentLoaded', function() {
-    const links = document.querySelectorAll('a[href^="#"]');
-    
-    links.forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            
-            const targetId = this.getAttribute('href');
-            const targetSection = document.querySelector(targetId);
-            
-            if (targetSection) {
-                targetSection.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-            }
-        });
-    });
-});
-
-// Add hover effects to cards
-document.addEventListener('DOMContentLoaded', function() {
-    const cards = document.querySelectorAll('.card');
-    
-    cards.forEach(card => {
-        card.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-4px)';
-        });
-        
-        card.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateY(0)';
-        });
-    });
-});
-
-// Enhanced Animations and Interactions
-function addEnhancedAnimations() {
-    // Add stagger animations to cards
-    const cards = document.querySelectorAll('.card');
-    cards.forEach((card, index) => {
-        card.style.animationDelay = `${index * 0.1}s`;
-        card.classList.add('fade-in');
-    });
-    
-    // Add enhanced hover effects
-    addEnhancedHoverEffects();
-    
-    // Add intersection observer for scroll animations
-    addScrollAnimations();
-}
-
-function addEnhancedHoverEffects() {
-    const cards = document.querySelectorAll('.card');
-    
-    cards.forEach(card => {
-        card.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-8px) scale(1.02)';
-            this.style.zIndex = '10';
-        });
-        
-        card.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateY(0) scale(1)';
-            this.style.zIndex = '1';
-        });
-    });
-    
-    // Enhanced button interactions
-    const buttons = document.querySelectorAll('.btn');
-    buttons.forEach(btn => {
-        btn.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-2px)';
-        });
-        
-        btn.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateY(0)';
-        });
-        
-        btn.addEventListener('click', function() {
-            this.style.transform = 'translateY(1px) scale(0.98)';
-            setTimeout(() => {
-                this.style.transform = 'translateY(-2px) scale(1)';
-            }, 150);
-        });
-    });
-}
-
-function addScrollAnimations() {
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-    };
-    
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('animate-in');
-            }
-        });
-    }, observerOptions);
-    
-    // Observe all cards and important elements
-    const elements = document.querySelectorAll('.card, .feature-card, .team-card, .stat-card');
-    elements.forEach(el => observer.observe(el));
 }
